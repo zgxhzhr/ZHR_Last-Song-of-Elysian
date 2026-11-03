@@ -75,6 +75,16 @@ public final class MeshVaoRenderer {
     private int ibo = -1;
     private int indexCount;
 
+    // ==== 诊断用（不影响渲染行为）====
+    private static final org.slf4j.Logger LOG =
+            org.slf4j.LoggerFactory.getLogger("lastsongofelysian/mmd/vao");
+    private static int statDraws;
+    private static int statNullShader;
+    private static int statPinSkips;
+
+    /** 固定使用的着色器。null 表示还没挑到合适的。 */
+    private ShaderInstance pinnedShader;
+
     private int locPos = -1;
     private int locNrm = -1;
     private int locUv0 = -1;
@@ -157,28 +167,75 @@ public final class MeshVaoRenderer {
             init(model);
         }
         Minecraft mc = Minecraft.getInstance();
-        ShaderInstance shader = RenderSystem.getShader();
-        if (shader == null) {
-            return;
+
+        // ==== 钉住一个着色器，不要每次继承 RenderSystem.getShader() ====
+        //
+        // 实测日志（一次采样）：shader 切换 7167 次、涉及 6 个不同 program，
+        // 其中 0x43 / 0x76 / 0xa0 连 Normal 属性都没有（nrm=-1），0x76 连光照
+        // 贴图属性都没有（uv2=-1）。null shader 次数是 0。
+        //
+        // 也就是说：模型每帧被不同的 shader 画，颜色/光照/采样路径一直在变，
+        // 这才是「时隐时现」的来源，而不是拿不到 shader。
+        //
+        // 解法：挑一个属性齐全的 shader 固定下来。不再随 MC 的批次抖动。
+        if (pinnedShader == null || !GL46C.glIsProgram(pinnedShader.getId())) {
+            pinnedShader = null;
+            ShaderInstance candidate = RenderSystem.getShader();
+            if (candidate == null) {
+                statNullShader++;
+                if ((statNullShader & 0x3F) == 1) {
+                    LOG.warn("[MMD/VAO] 第 {} 次拿到 null shader（累计 draw {} 次），跳过绘制",
+                            statNullShader, statDraws);
+                }
+                return;
+            }
+
+            int candProg = candidate.getId();
+            boolean hasPos = attrib(candProg, ATTR_POS) >= 0;
+            boolean hasUv0 = attrib(candProg, ATTR_UV0) >= 0;
+            boolean hasUv2 = attrib(candProg, ATTR_UV2) >= 0;
+
+            // 挑选标准：Position + UV0 + UV2（光照）三者齐全即可，**不要求 Normal**。
+            //
+            // 为什么不要带 Normal 的实体着色器（0x58/0x64/0x4f）：
+            // 那类 shader 依赖 MC 在 RenderType.setupRenderState() 里额外绑定的
+            // 覆盖层采样器等状态，我们自己画时没有这些，实测结果是整体被画成
+            // 全透明（完全不显示）。而 0x43 这类「有位置/UV/光照、无法线」的
+            // shader 是自足的，直接画就能出像素——原始版本里占 2361 次，
+            // 是能显示的那个。代价是没有法线光照，明暗会偏平，但至少稳定可见。
+            boolean usable = hasPos && hasUv0 && hasUv2;
+            if (usable) {
+                pinnedShader = candidate;
+            } else if (++statPinSkips > 240 && hasPos && hasUv0) {
+                pinnedShader = candidate;
+                LOG.warn("[MMD/VAO] 等待 {} 帧仍无位置/UV/光照齐全的 shader，退用 program=0x{}",
+                        statPinSkips, Integer.toHexString(candProg));
+            }
+
+            if (pinnedShader == null) {
+                return;
+            }
+
+            locProgram = pinnedShader.getId();
+            locPos = attrib(locProgram, ATTR_POS);
+            locNrm = attrib(locProgram, ATTR_NRM);
+            locUv0 = attrib(locProgram, ATTR_UV0);
+            locColor = attrib(locProgram, ATTR_COLOR);
+            locUv2 = attrib(locProgram, ATTR_UV2);
+            locModelView = GL46C.glGetUniformLocation(locProgram, "ModelViewMat");
+            if (locModelView == -1) {
+                locModelView = GL46C.glGetUniformLocation(locProgram, "modelViewMatrix");
+            }
+            locProj = GL46C.glGetUniformLocation(locProgram, "ProjMat");
+            if (locProj == -1) {
+                locProj = GL46C.glGetUniformLocation(locProgram, "projectionMatrix");
+            }
+            LOG.info("[MMD/VAO] 已钉住 shader program=0x{} pos={} nrm={} uv0={} color={} uv2={} modelView={} proj={}",
+                    Integer.toHexString(locProgram),
+                    locPos, locNrm, locUv0, locColor, locUv2, locModelView, locProj);
         }
 
-        int program = shader.getId();
-        if (program != locProgram) {
-            locProgram = program;
-            locPos = attrib(program, ATTR_POS);
-            locNrm = attrib(program, ATTR_NRM);
-            locUv0 = attrib(program, ATTR_UV0);
-            locColor = attrib(program, ATTR_COLOR);
-            locUv2 = attrib(program, ATTR_UV2);
-            locModelView = GL46C.glGetUniformLocation(program, "ModelViewMat");
-            if (locModelView == -1) {
-                locModelView = GL46C.glGetUniformLocation(program, "modelViewMatrix");
-            }
-            locProj = GL46C.glGetUniformLocation(program, "ProjMat");
-            if (locProj == -1) {
-                locProj = GL46C.glGetUniformLocation(program, "projectionMatrix");
-            }
-        }
+        ShaderInstance shader = pinnedShader;
 
         // 上传蒙皮后的位置与法线
         posBuf.clear();
