@@ -12,7 +12,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.level.Level;
@@ -54,14 +53,18 @@ public class ElysianHeroNpcEntity extends PathfinderMob {
 
     @Override
     protected void registerGoals() {
+        // 英桀是固定的立绘式 NPC，不允许走动。
+        //
+        // 刻意只留 FloatGoal（进水时上浮，防止沉底淹死），不放任何会改变位置的 goal：
+        //   - WaterAvoidingRandomStrollGoal → 会到处乱走
+        //   - LookAtPlayerGoal / RandomLookAroundGoal → 会拧身体 yaw，
+        //     而模型朝向直接取自 entity.getYRot()，身体一旦自动对着玩家，
+        //     HeroAnimator 算出的头部偏角恒为 0，眼部追踪就看不出来了。
+        // 看向玩家的表现完全交给 HeroAnimator 的头部+眼球骨骼。
+        //
+        // 注意：交互（聊天/右键）走的是 mobInteract()，与这里无关，
+        // 所以维尔薇的螺旋工坊升级、帕朵菲莉丝的商店都不受影响。
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        // 刻意不加 LookAtPlayerGoal / RandomLookAroundGoal：
-        // 这两个 goal 会把**身体 yaw** 拧向玩家或随机方向，而模型朝向直接取自
-        // entity.getYRot()——身体已经自动对着玩家时，HeroAnimator 算出的
-        // 「头相对身体的偏角」恒为 0，眼部追踪就完全看不出来。
-        // 看向玩家的表现交给 HeroAnimator 的头部+眼球骨骼（有角度上限，超范围不追），
-        // 身体只在走位时自然转向。
-        this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 0.65D));
     }
 
     public HeroVariant getVariant() {

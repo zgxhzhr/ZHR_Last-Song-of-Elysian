@@ -13,7 +13,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -40,16 +39,9 @@ public class PardofelisMerchantEntity extends PathfinderMob {
 
     @Override
     protected void registerGoals() {
+        // 与英桀 NPC 一致：站桩，不走路。
+        // 商店交互在 mobInteract() 里（PardofelisShopMenu），与 AI goal 无关，不受影响。
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        // 刻意不加 LookAtPlayerGoal / RandomLookAroundGoal：它们会拧身体的 yaw，
-        // 而模型朝向直接取自 entity.getYRot()，身体一旦自动对着玩家，
-        // HeroAnimator 算出的头部偏角恒为 0，眼部追踪就看不出来了。
-        // 看向玩家改由头部+眼球骨骼表现（有角度上限）。
-        this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 0.7D));
-        // 刻意不加 LookAtPlayerGoal / RandomLookAroundGoal：它们会拧身体的 yaw，
-        // 而模型朝向直接取自 entity.getYRot()，身体一旦自动对着玩家，
-        // HeroAnimator 算出的头部偏角恒为 0，眼部追踪就看不出来了。
-        // 看向玩家改由头部+眼球骨骼表现（有角度上限）。
     }
 
     @Override

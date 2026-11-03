@@ -34,12 +34,17 @@ public final class HeroAnimator {
     private static final double LOOK_RANGE = 10.0;
 
     /** 头部最多能转多少度，超出部分交给眼球。 */
-    private static final float HEAD_YAW_LIMIT = 52.0F;
+    private static final float HEAD_YAW_LIMIT = 55.0F;
     private static final float HEAD_PITCH_LIMIT = 22.0F;
 
-    /** 眼球最多补多少度。 */
-    private static final float EYE_YAW_LIMIT = 16.0F;
-    private static final float EYE_PITCH_LIMIT = 8.0F;
+    /**
+ * 眼球最多补多少度。
+ *
+ * <p>MMD 的眼球骨骼（両目/右目/左目）本意只是「视线微微一偏」，转十几度
+ * 会让瞳孔跑到眼角外，看起来像斜视。头部已经能转 55°，眼球只留很小余量。
+ */
+    private static final float EYE_YAW_LIMIT = 6.0F;
+    private static final float EYE_PITCH_LIMIT = 3.0F;
 
     /** 头部/眼球的平滑速度（每 tick 收敛比例，越小越迟缓）。 */
     private static final float LOOK_SMOOTH = 0.35F;
@@ -119,8 +124,14 @@ public final class HeroAnimator {
             double dy = lookTarget.getEyeY() - (entity.getY() + eyeHeight);
 
             float targetWorldYaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
-            float deltaYaw = Mth.wrapDegrees(targetWorldYaw - entity.getYRot());
-            float deltaPitch = (float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
+            // 坐标系换算：MC 的 yaw 从 +Z 向 -X **顺时针**增长，而 MMD 骨骼的
+            // Y 轴旋转是右手系（绕 +Y **逆时针**）。两者方向相反，所以送进骨骼前
+            // 先取负——否则玩家站左边、头会往右转。
+            // 头部和眼球共用这一个值，翻一次两边就都对了。
+            float deltaYaw = -Mth.wrapDegrees(targetWorldYaw - entity.getYRot());
+            // 俯仰同理：dy > 0 表示目标在头顶以上，此时骨骼 X 轴要正转才是抬头。
+            // 之前这里取了负号，表现就是玩家站高处、她低头往下看。
+            float deltaPitch = (float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
 
             // 头部分担大头，超出的给眼球；走路时头转幅度收一点，看起来更自然。
             // 用软限幅（tanh 形状）代替硬 clamp，目标转到极限附近时是渐进减速而不是
@@ -195,13 +206,49 @@ public final class HeroAnimator {
                 skeleton.setRotation(lKnee, -bend, 0.0F, 0.0F);
             }
 
+            // --- 手臂摆动 ---
+            // 关键：Z 轴必须保留 ARM_REST_Z，不能写 0。
+            // 基础站姿是靠「上臂 Z 轴 ±ARM_REST_Z」把 A-pose 收下来的；
+            // 走路时如果这里把 Z 清零，等于撤销站姿，手臂会瞬间弹回模型自带的
+            // 外张姿势——看起来就是「一走动就变回默认动画」。
             int rArm = firstBone(skeleton, "右腕");
             int lArm = firstBone(skeleton, "左腕");
             if (rArm >= 0) {
-                skeleton.setRotation(rArm, Mth.sin(walkPhase + (float) Math.PI) * swingAngle * 0.7F, 0.0F, 0.0F);
+                skeleton.setRotation(rArm,
+                        Mth.sin(walkPhase + (float) Math.PI) * swingAngle * 0.9F,
+                        0.0F,
+                        ARM_REST_Z);
             }
             if (lArm >= 0) {
-                skeleton.setRotation(lArm, Mth.sin(walkPhase) * swingAngle * 0.7F, 0.0F, 0.0F);
+                skeleton.setRotation(lArm,
+                        Mth.sin(walkPhase) * swingAngle * 0.9F,
+                        0.0F,
+                        -ARM_REST_Z);
+            }
+
+            // 前臂（右ひじ/左ひじ）跟随后摆，避免手臂像一根直棍。
+            // Z 保持基础站姿的 ±0.12 不变，只加 X 方向的滞后摆动。
+            int rFore = firstBone(skeleton, "右ひじ");
+            int lFore = firstBone(skeleton, "左ひじ");
+            if (rFore >= 0) {
+                float trailR = Math.max(0.0F, Mth.sin(walkPhase + (float) Math.PI)) * 0.55F * move;
+                skeleton.setRotation(rFore, trailR, 0.0F, 0.12F);
+            }
+            if (lFore >= 0) {
+                float trailL = Math.max(0.0F, Mth.sin(walkPhase)) * 0.55F * move;
+                skeleton.setRotation(lFore, trailL, 0.0F, -0.12F);
+            }
+
+            // 肩膀轻微参与，让摆臂从肩关节发起而不是整条手臂平移
+            int rShoulder = firstBone(skeleton, "右肩");
+            int lShoulder = firstBone(skeleton, "左肩");
+            if (rShoulder >= 0) {
+                skeleton.setRotation(rShoulder,
+                        Mth.sin(walkPhase + (float) Math.PI) * swingAngle * 0.25F, 0.0F, 0.0F);
+            }
+            if (lShoulder >= 0) {
+                skeleton.setRotation(lShoulder,
+                        Mth.sin(walkPhase) * swingAngle * 0.25F, 0.0F, 0.0F);
             }
 
             // 走路时身体上下轻微起伏
