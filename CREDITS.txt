@@ -46,3 +46,13 @@ This mod is not affiliated with or endorsed by miHoYo, HoYoverse, Mojang Studios
 所有第三方作品的所有权归原作者及相应权利人所有。本项目自行创作的代码与原创素材归其各自作者所有。
 
 All third-party works remain the property of their original creators and respective rights holders. Code and original assets created specifically for this project belong to their respective contributors.
+
+
+================================================================================
+第三方开源
+================================================================================
+MC-MMD-rust (MIT License)
+  Copyright (c) 2026 shiroha
+  https://github.com/zgxhzhr/ZHR_MC-MMD-rust
+  - 三角网格的 VAO/VBO 渲染架构参考该项目
+  - 许可证全文见 THIRD_PARTY_LICENSES.md

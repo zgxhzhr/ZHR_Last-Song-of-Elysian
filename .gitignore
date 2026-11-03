@@ -29,3 +29,14 @@ replay_pid*
 build/
 run/
 run-data/
+
+# 往世乐土维度地形包（*.zip 被全局忽略，这里单独放行）
+!src/main/resources/data/lastsongofelysian/elysian_realm/elysian_realm_world.zip
+
+# Python 工具产物
+__pycache__/
+*.pyc
+
+# tools/pmx2mesh 的离线预览/调试输出图（可随时重新生成）
+tools/pmx2mesh/_*.png
+tools/pmx2mesh/*_simp_*.png

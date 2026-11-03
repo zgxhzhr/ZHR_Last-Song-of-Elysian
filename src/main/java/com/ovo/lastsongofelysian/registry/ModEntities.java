@@ -56,6 +56,9 @@ public class ModEntities {
     public static final RegistryObject<EntityType<ElysianHeroNpcEntity>> EDEN_NPC =
             registerHero("eden_npc", ElysianHeroNpcEntity.HeroVariant.EDEN);
 
+    public static final RegistryObject<EntityType<ElysianHeroNpcEntity>> MOBIUS_NPC =
+            registerHero("mobius_npc", ElysianHeroNpcEntity.HeroVariant.MOBIUS);
+
 
 
 

@@ -39,6 +39,7 @@ public class ElysianHeroRenderer
             case GRISEO -> GRISEO;
             case VILL_V -> VILL_V;
             case EDEN -> EDEN;
+            case MOBIUS -> ELYSIA;
         };
     }
 

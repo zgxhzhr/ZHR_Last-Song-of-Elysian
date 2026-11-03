@@ -6,6 +6,7 @@ import com.ovo.lastsongofelysian.client.overlay.DisciplineOverlay;
 import com.ovo.lastsongofelysian.client.overlay.CombatStatusOverlay;
 import com.ovo.lastsongofelysian.client.FlawlessKeyMappings;
 import com.ovo.lastsongofelysian.client.HudKeyMappings;
+import com.ovo.lastsongofelysian.client.MeshDebugKeyMapping;
 import com.ovo.lastsongofelysian.config.ClientHudConfig;
 import com.ovo.lastsongofelysian.client.screen.PardofelisShopScreen;
 import com.ovo.lastsongofelysian.network.ModNetwork;
@@ -98,6 +99,7 @@ public class lastsongofelysian {
             event.register(HudKeyMappings.TOGGLE_BLOOD_RELEASE);
             event.register(HudKeyMappings.TOGGLE_BODHI_PASSIVE_DAMAGE);
             event.register(HudKeyMappings.OPEN_HUD_EDITOR);
+            event.register(MeshDebugKeyMapping.CYCLE);
         }
 
         @SubscribeEvent

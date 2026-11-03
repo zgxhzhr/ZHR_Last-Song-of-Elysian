@@ -2466,5 +2466,8 @@
   "tooltip.lastsongofelysian.signet.extension_core_infinity_m": "Gain 10% progress each second. At 100%, enter Consciousness Synchronization for 6 seconds. During it, hits by player summons or player-controlled allies release Shadow of the World Devourer for 50% of base attack damage, with a 0.8-second cooldown. While you and such an ally are both on the field, gain 5% damage penetration.",
   "tooltip.lastsongofelysian.signet.infinity_sacrifice_m": "After a player summon or player-controlled ally has remained on the field for more than 1 second, extend Consciousness Synchronization by 1 second each second while it is active; otherwise gain another 5% progress each second.",
   "tooltip.lastsongofelysian.signet.infinity_immortal_m": "After a player summon or player-controlled ally has been on the field for 8 seconds, its damage rises by 5% each second, up to 50%. During Consciousness Synchronization, you inherit part of the damage bonus from allies on the field, up to 30%.",
-  "tooltip.lastsongofelysian.signet.infinity_collapse_m": "Every damaging hit by a player summon or player-controlled ally raises the target's total damage taken by 1%. Your hits do the same during Consciousness Synchronization. Trigger interval: 1 second; maximum bonus: 30%."
+  "tooltip.lastsongofelysian.signet.infinity_collapse_m": "Every damaging hit by a player summon or player-controlled ally raises the target's total damage taken by 1%. Your hits do the same during Consciousness Synchronization. Trigger interval: 1 second; maximum bonus: 30%.",
+  "entity.lastsongofelysian.mobius_npc": "Mobius",
+  "item.lastsongofelysian.mobius_npc_spawn_egg": "Mobius Spawn Egg",
+  "key.lastsongofelysian.mesh_debug": "Cycle Mesh Debug Mode"
 }

@@ -1,12 +1,12 @@
 package com.ovo.lastsongofelysian.client;
 
 import com.ovo.lastsongofelysian.client.model.ElysianHeroModel;
-import com.ovo.lastsongofelysian.client.model.PardofelisMerchantModel;
 import com.ovo.lastsongofelysian.client.renderer.CorrosionMirrorRenderer;
 import com.ovo.lastsongofelysian.client.renderer.EdenBlackHoleRenderer;
 import com.ovo.lastsongofelysian.client.renderer.ElysianHeroRenderer;
-import com.ovo.lastsongofelysian.client.renderer.PardofelisMerchantRenderer;
+import com.ovo.lastsongofelysian.client.renderer.MeshHeroRenderer;
 import com.ovo.lastsongofelysian.lastsongofelysian;
+import com.ovo.lastsongofelysian.entity.PardofelisMerchantEntity;
 import com.ovo.lastsongofelysian.registry.ModEntities;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -26,10 +26,6 @@ public class ModEntityRenderers {
                 ElysianHeroModel.LAYER_LOCATION,
                 ElysianHeroModel::createBodyLayer
         );
-        event.registerLayerDefinition(
-                PardofelisMerchantModel.LAYER_LOCATION,
-                PardofelisMerchantModel::createBodyLayer
-        );
     }
 
     @SubscribeEvent
@@ -44,27 +40,33 @@ public class ModEntityRenderers {
         );
         event.registerEntityRenderer(
                 ModEntities.APONIA_NPC.get(),
-                ElysianHeroRenderer::new
+                MeshHeroRenderer.heroProvider()
         );
         event.registerEntityRenderer(
                 ModEntities.ELYSIA_NPC.get(),
-                ElysianHeroRenderer::new
+                MeshHeroRenderer.heroProvider()
+        );
+        event.registerEntityRenderer(
+                ModEntities.MOBIUS_NPC.get(),
+                MeshHeroRenderer.heroProvider()
         );
         event.registerEntityRenderer(
                 ModEntities.GRISEO_NPC.get(),
-                ElysianHeroRenderer::new
+                MeshHeroRenderer.heroProvider()
         );
         event.registerEntityRenderer(
                 ModEntities.VILL_V_NPC.get(),
-                ElysianHeroRenderer::new
+                MeshHeroRenderer.heroProvider()
         );
         event.registerEntityRenderer(
                 ModEntities.EDEN_NPC.get(),
                 ElysianHeroRenderer::new
         );
+
+        // 帕朵菲莉丝商人：实体本身不带变体信息，固定读 pardofelis 模型
         event.registerEntityRenderer(
                 ModEntities.PARDOFELIS_MERCHANT.get(),
-                PardofelisMerchantRenderer::new
+                MeshHeroRenderer.<PardofelisMerchantEntity>fixedProvider("pardofelis")
         );
     }
 }

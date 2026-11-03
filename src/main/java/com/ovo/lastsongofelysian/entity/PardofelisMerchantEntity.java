@@ -13,8 +13,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -43,9 +41,15 @@ public class PardofelisMerchantEntity extends PathfinderMob {
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        // 刻意不加 LookAtPlayerGoal / RandomLookAroundGoal：它们会拧身体的 yaw，
+        // 而模型朝向直接取自 entity.getYRot()，身体一旦自动对着玩家，
+        // HeroAnimator 算出的头部偏角恒为 0，眼部追踪就看不出来了。
+        // 看向玩家改由头部+眼球骨骼表现（有角度上限）。
         this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 0.7D));
-        this.goalSelector.addGoal(4, new RandomLookAroundGoal(this));
+        // 刻意不加 LookAtPlayerGoal / RandomLookAroundGoal：它们会拧身体的 yaw，
+        // 而模型朝向直接取自 entity.getYRot()，身体一旦自动对着玩家，
+        // HeroAnimator 算出的头部偏角恒为 0，眼部追踪就看不出来了。
+        // 看向玩家改由头部+眼球骨骼表现（有角度上限）。
     }
 
     @Override

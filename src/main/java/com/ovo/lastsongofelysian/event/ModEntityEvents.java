@@ -45,6 +45,10 @@ public class ModEntityEvents {
                 ModEntities.EDEN_NPC.get(),
                 ElysianHeroNpcEntity.createAttributes().build()
         );
+        event.put(
+                ModEntities.MOBIUS_NPC.get(),
+                ElysianHeroNpcEntity.createAttributes().build()
+        );
     }
 
 }

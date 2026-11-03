@@ -2466,5 +2466,8 @@
   "tooltip.lastsongofelysian.signet.extension_core_infinity_m": "每秒增加10%进度；达到100%时进入【意识同步】状态，持续6秒。期间玩家召唤物或听从玩家控制的友方单位攻击命中时释放【世界吞噬者的影迹】，造成50%角色基础攻击力伤害，冷却0.8秒。玩家与友方单位同时在场时，玩家获得5%伤害穿透。",
   "tooltip.lastsongofelysian.signet.infinity_sacrifice_m": "玩家召唤物或听从玩家控制的友方单位在场超过1秒后：处于【意识同步】时，每秒延长其持续时间1秒；不处于该状态时，每秒增加5%进度。",
   "tooltip.lastsongofelysian.signet.infinity_immortal_m": "玩家召唤物或听从玩家控制的友方单位在场8秒后，其造成的伤害每秒提高5%，上限50%。处于【意识同步】时，玩家按一定比例获得在场友方单位的伤害加成，上限30%。",
-  "tooltip.lastsongofelysian.signet.infinity_collapse_m": "玩家召唤物或听从玩家控制的友方单位每次对目标造成伤害，使其受到的全伤害提高1%；【意识同步】期间玩家每次攻击也会使其受到的全伤害提高1%。触发间隔1秒，上限30%。"
+  "tooltip.lastsongofelysian.signet.infinity_collapse_m": "玩家召唤物或听从玩家控制的友方单位每次对目标造成伤害，使其受到的全伤害提高1%；【意识同步】期间玩家每次攻击也会使其受到的全伤害提高1%。触发间隔1秒，上限30%。",
+  "entity.lastsongofelysian.mobius_npc": "梅比乌斯",
+  "item.lastsongofelysian.mobius_npc_spawn_egg": "梅比乌斯刷怪蛋",
+  "key.lastsongofelysian.mesh_debug": "切换网格调试模式"
 }

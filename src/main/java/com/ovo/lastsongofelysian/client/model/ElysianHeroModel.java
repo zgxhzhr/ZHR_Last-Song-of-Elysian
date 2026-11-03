@@ -257,6 +257,16 @@ public class ElysianHeroModel
                         0.045F
                                 + idleSlow * 0.005F;
             }
+
+            case MOBIUS -> {
+                this.leftArm.zRot =
+                        -0.020F
+                                - idleFast * 0.008F;
+
+                this.rightArm.zRot =
+                        0.020F
+                                + idleFast * 0.008F;
+            }
         }
 
         this.hat.copyFrom(
